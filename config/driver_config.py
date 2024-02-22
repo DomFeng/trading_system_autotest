@@ -28,6 +28,7 @@ class DriverConfig:
         options.add_argument('--disable-dev-shm-usage')
         # 解决selenium无法访问https的问题
         options.add_argument("--ignore-certificate-errors")
+        # 允许忽略localhost上的TLS/SSL证书错误
         options.add_argument("--allow-insecure-localhost")
         # 无痕模式
         options.add_argument("--incognito")
@@ -46,7 +47,6 @@ class DriverConfig:
         # driver = webdriver.Chrome('C:\\chromedriver.exe')
 
         driver = webdriver.Chrome(get_local_webdriver_path(), options=options)
-
 
         # 隐性等待时间
         driver.implicitly_wait(3)
