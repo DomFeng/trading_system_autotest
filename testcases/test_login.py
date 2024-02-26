@@ -6,11 +6,12 @@
 from time import sleep
 from config.driver_config import DriverConfig
 from page.LoginPage import LoginPage
+# from . import __init__ as init
 
 
 class TestLogin:
-    def test_login(self):
-        driver = DriverConfig.driver_config()
+    def test_login(self, driver):
+        # driver = DriverConfig.driver_config()
         driver.get("http://192.168.0.110")
         sleep(3)
         LoginPage().login_input_value(driver, "用户名", "william")
@@ -18,5 +19,5 @@ class TestLogin:
         LoginPage().login_input_value(driver, "密码", "1234abcd!")
         sleep(1)
         LoginPage().login_button_click(driver, "登录")
-        sleep(3)
-        driver.quit()
+        sleep(2)
+
