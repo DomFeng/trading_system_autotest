@@ -108,12 +108,12 @@ class ObjectMap:
         else:
             pass
 
-    def element_appear(self, driver, locate_type, locate_expression, timeout=30):
+    def element_appear(self, driver, locate_type, locator_expression, timeout=30):
         """
         等待页面元素出现
         :param driver:浏览器驱动
         :param locate_type: 定位方式
-        :param locate_expression: 定位表达式
+        :param locator_expression: 定位表达式
         :param timeout: 超时时间
         :return:
         """
@@ -124,7 +124,7 @@ class ObjectMap:
             stop_ms = start_ms + (timeout * 1000)
             for x in range(int(timeout * 10)):
                 try:
-                    element = driver.find_element(by=locate_type, value=locate_expression)
+                    element = driver.find_element(by=locate_type, value=locator_expression)
                     if element.is_desplayed():
                         return element
                     else:
@@ -135,7 +135,7 @@ class ObjectMap:
                         break
                     time.sleep(0.1)
                     pass
-            raise Exception("元素没有出现，定位方式：" + locate_type + "\n定位表达式：" + locate_expression)
+            raise Exception("元素没有出现，定位方式：" + locate_type + "\n定位表达式：" + locator_expression)
         else:
             pass
 
@@ -238,7 +238,7 @@ class ObjectMap:
                 element.send_keys(fill_value)
                 self.wait_for_ready_state_complete(driver=driver)
             else:
-                #截取至倒数第二位
+                # 截取至倒数第二位
                 fill_value = fill_value[:-1]
                 element.send_keys(fill_value)
                 element.send_keys(Keys.RETURN)
@@ -246,7 +246,7 @@ class ObjectMap:
         except StaleElementReferenceException:
             self.wait_for_ready_state_complete(driver=driver)
             time.sleep(0.06)
-            element=self.element_appear(driver,locate_type=locate_type,locate_expression=locator_expression)
+            element = self.element_appear(driver, locate_type=locate_type, locate_expression=locator_expression)
             element.clear()
             # 如果填入的值结尾不是\n
             if not fill_value.endswith("\n"):
@@ -263,6 +263,68 @@ class ObjectMap:
 
         return True
 
+    def element_click(
+            self,
+            driver,
+            locate_type,
+            locator_expression,
+            locate_type_disappear=None,
+            locator_expression_disappear=None,
+            locate_type_appear=None,
+            locator_expression_appear=None,
+            timeout=30
+    ):
+        """
+        元素点击
+        :param driver: 浏览器驱动
+        :param locate_type: 定位方式类型
+        :param locator_expression:定位表达式
+        :param locate_type_disappear:等待元素消失的定位类型
+        :param locator_expression_disappear:等待元素消失的定位表达式
+        :param locate_type_appear:等待元素出现的定位类型
+        :param locator_expression_appear:等待元素出现的定位表达式
+        :param timeout:超时时间
+        :return:
+        """
+        # 元素要可见
+        element = self.element_appear(
+            driver=driver,
+            locate_type=locate_type,
+            locator_expression=locator_expression,
+            timeout=timeout
+        )
+        try:
+            element.click()
+        except StaleElementReferenceException:
+            self.wait_for_ready_state_complete(driver=driver)
+            time.sleep(0.06)
+            element = self.element_appear(
+                driver=driver,
+                locate_type=locate_type,
+                locator_expression=locator_expression,
+                timeout=timeout
+            )
+            element.click()
+        except Exception as e:
+            print("页面出现异常，元素不可点击", e)
+            return False
+        try:
+            # 点击元素后的元素出现或消失
+            self.element_appear(
+                driver,
+                locate_type_appear,
+                locator_expression_appear
+            )
+            self.element_disappear(
+                driver,
+                locate_type_disappear,
+                locator_expression_disappear
+            )
+        except Exception as e:
+            print("等待元素消失或出现失败", e)
+            return False
+
+        return True
 
 
 if __name__ == '__main__':
